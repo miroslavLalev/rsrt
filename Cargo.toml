@@ -1,0 +1,19 @@
+[package]
+name = "rsrt"
+version = "0.1.0"
+authors = ["Miroslav Lalev <miro95@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "rsrt"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rsrt-cli"
+path = "src/bin/main.rs"
+
+[dependencies]
+image = "0.22.3"
+rand = "0.7.2"
