@@ -27,8 +27,8 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn as_unit(&self) -> Vec3 {
-        *self / self.len()
+    pub fn as_unit(self) -> Vec3 {
+        self / self.len()
     }
 }
 

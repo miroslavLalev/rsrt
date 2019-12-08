@@ -1,21 +1,22 @@
 use super::super::math::Vec3;
-use super::Scatterable;
 use super::Ray;
+use super::Scatterable;
 use super::{Hit, Hittable};
 
-pub struct Sphere {
+pub struct Sphere<M: Scatterable<M>> {
     center: Vec3,
     r: f32,
+    mat: M,
 }
 
-impl Sphere {
-    pub fn new(center: Vec3, r: f32) -> Sphere {
-        Sphere { center, r }
+impl<M: Scatterable<M>> Sphere<M> {
+    pub fn new(center: Vec3, r: f32, mat: M) -> Sphere<M> {
+        Sphere { center, r, mat }
     }
 }
 
-impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+impl<M: Scatterable<M>> Hittable<M> for Sphere<M> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit<M>> {
         let oc = r.origin() - self.center;
         let a = r.direction().dot(r.direction());
         let b = 2.0 * oc.dot(r.direction());
@@ -28,12 +29,12 @@ impl Hittable for Sphere {
         let tmp = (-b - disc.sqrt()) / (2.0 * a);
         if tmp < t_max && tmp > t_min {
             let p = r.point_at_param(tmp);
-            return Some(Hit::new(tmp, p, (p - self.center) / self.r));
+            return Some(Hit::new(tmp, p, (p - self.center) / self.r, &self.mat));
         } else {
             let tmp = (-b + disc.sqrt()) / (2.0 * a);
             if tmp < t_max && tmp > t_min {
                 let p = r.point_at_param(tmp);
-                return Some(Hit::new(tmp, p, (p - self.center) / self.r));
+                return Some(Hit::new(tmp, p, (p - self.center) / self.r, &self.mat));
             }
         }
 
