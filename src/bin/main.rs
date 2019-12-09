@@ -3,7 +3,7 @@ extern crate rsrt;
 use rand::Rng;
 use rsrt::math::Vec3;
 use rsrt::trace::{Camera, Hittable, Ray, Sphere};
-use rsrt::trace::{Lambertian};
+use rsrt::trace::{Lambertian, Metal};
 
 fn main() -> Result<(), std::io::Error> {
     let nx = 200;
@@ -53,7 +53,8 @@ fn color(r: Ray) -> Vec3 {
     let s2 = Sphere::new(
         Vec3(0.0, -100.5, -1.0),
         100.0,
-        Lambertian::new(Vec3(0.0, 0.0, 0.3)),
+        //        Lambertian::new(Vec3(0.0, 0.0, 0.3)),
+        Metal::new(Vec3(0.8, 0.8, 0.8), 1.0),
     );
     if let Some(hit) = s2.hit(&r, 0.001, std::f32::MAX) {
         if let Some((r, col)) = hit.scatter(&r) {
