@@ -89,3 +89,64 @@ impl Scatterable<Metal> for Metal {
         }
     }
 }
+
+pub struct Dielectric {
+    rfn_ind: f32,
+}
+
+impl Dielectric {
+    pub fn new(rfn_ind: f32) -> Dielectric {
+        Dielectric { rfn_ind }
+    }
+
+    fn refract(v: Vec3, n: Vec3, ni_nt: f32) -> Option<Vec3> {
+        let v = v.as_unit();
+        let dt = v.dot(n);
+        let disc = 1.0 - ni_nt * ni_nt * (1.0 - dt * dt);
+        if disc > 0.0 {
+            Some(ni_nt * (v - n * dt) - n * disc.sqrt())
+        } else {
+            None
+        }
+    }
+
+    fn schlick(&self, cos: f32) -> f32 {
+        let r0 = ((1.0 - self.rfn_ind) / (1.0 + self.rfn_ind)).powi(2);
+        r0 + (1.0 - r0) * (1.0 - cos).powi(5)
+    }
+
+    fn rand_float() -> f32 {
+        rand::thread_rng().gen_range(0.0, 1.0)
+    }
+}
+
+impl Scatterable<Dielectric> for Dielectric {
+    fn scatter(&self, r: &Ray, hit: Hit<Dielectric>) -> Option<(Ray, Vec3)> {
+        let reflected = Metal::reflect(r.direction(), hit.n());
+
+        let (out_norm, ni_nt, cos) = if r.direction().dot(hit.n()) > 0.0 {
+            (
+                -hit.n(),
+                self.rfn_ind,
+                self.rfn_ind * r.direction().dot(hit.n()) / r.direction().len(),
+            )
+        } else {
+            (
+                hit.n(),
+                1.0 / self.rfn_ind,
+                -r.direction().dot(hit.n()) / r.direction().len(),
+            )
+        };
+
+        let (refracted, reflect_prob) = match Dielectric::refract(r.direction(), out_norm, ni_nt) {
+            Some(refracted) => (Some(refracted), self.schlick(cos)),
+            None => (None, 1.0),
+        };
+
+        if Dielectric::rand_float() < reflect_prob {
+            Some((Ray::new(hit.p(), refracted?), Vec3(1.0, 1.0, 1.0)))
+        } else {
+            Some((Ray::new(hit.p(), reflected), Vec3(1.0, 1.0, 1.0)))
+        }
+    }
+}

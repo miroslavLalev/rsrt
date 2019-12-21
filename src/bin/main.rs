@@ -2,12 +2,12 @@ extern crate rsrt;
 
 use rand::Rng;
 use rsrt::math::Vec3;
-use rsrt::trace::{Camera, Hittable, Ray, Sphere};
+use rsrt::trace::{Camera, Dielectric, Hittable, Ray, Sphere};
 use rsrt::trace::{Lambertian, Metal};
 
 fn main() -> Result<(), std::io::Error> {
-    let nx = 200;
-    let ny = 100;
+    let nx = 1200;
+    let ny = 600;
     let ns = 100;
     let cam = Camera::new();
 
@@ -19,7 +19,7 @@ fn main() -> Result<(), std::io::Error> {
             let v = ((ny - y) as f32 + rand_float()) / ny as f32;
 
             let r = cam.get_ray(u, v);
-            col = col + color(r);
+            col = col + color(r, 0);
         }
         col = col / ns as f32;
         col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
@@ -32,33 +32,41 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/image.jpeg",
+        "c://Users/User/Desktop/image2_fix.jpeg",
         image::ImageFormat::JPEG,
     )
     //    buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
 }
 
-fn color(r: Ray) -> Vec3 {
+fn color(r: Ray, depth: u8) -> Vec3 {
     let s = Sphere::new(
         Vec3(0.0, 0.0, -1.0),
         0.5,
-        Lambertian::new(Vec3(0.3, 0.0, 0.0)),
+        //        Lambertian::new(Vec3(0.0, 0.4, 0.0)),
+        Dielectric::new(1.5),
     );
     if let Some(hit) = s.hit(&r, 0.001, std::f32::MAX) {
+        if depth > 50 {
+            return Vec3(0.0, 0.0, 0.0);
+        }
         if let Some((r, col)) = hit.scatter(&r) {
-            return col * color(r);
+            return col * color(r, depth + 1);
         }
     }
 
     let s2 = Sphere::new(
         Vec3(0.0, -100.5, -1.0),
         100.0,
-        //        Lambertian::new(Vec3(0.0, 0.0, 0.3)),
-        Metal::new(Vec3(0.8, 0.8, 0.8), 1.0),
+        Lambertian::new(Vec3(0.0, 0.6, 0.0)),
+        //        Metal::new(Vec3(0.6, 0.0, 0.0), 0.0),
+        //        Dielectric::new(0.3),
     );
     if let Some(hit) = s2.hit(&r, 0.001, std::f32::MAX) {
+        if depth > 50 {
+            return Vec3(0.0, 0.0, 0.0);
+        }
         if let Some((r, col)) = hit.scatter(&r) {
-            return col * color(r);
+            return col * color(r, depth + 1);
         }
     }
 

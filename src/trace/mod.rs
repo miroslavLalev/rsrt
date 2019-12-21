@@ -1,6 +1,6 @@
 pub use camera::Camera;
 pub use hit::{Hit, Hittable};
-pub use material::{Lambertian, Metal, Scatterable};
+pub use material::{Dielectric, Lambertian, Metal, Scatterable};
 pub use ray::Ray;
 pub use sphere::Sphere;
 

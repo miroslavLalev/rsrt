@@ -87,3 +87,11 @@ impl std::ops::Div<f32> for Vec3 {
         Vec3(self.0 / other, self.1 / other, self.2 / other)
     }
 }
+
+impl std::ops::Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        Vec3(-self.0, -self.1, -self.2)
+    }
+}
