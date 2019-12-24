@@ -1,6 +1,6 @@
 use crate::math::Vec3;
 use crate::trace::{Hit, Ray};
-use crate::utils::rng::{rand_in_unit_sphere, uniform_in_range};
+use crate::utils::rng::uniform_in_range;
 
 use super::utils as mtl_utils;
 use super::Scatterable;
@@ -15,8 +15,8 @@ impl Dielectric {
     }
 }
 
-impl Scatterable<Dielectric> for Dielectric {
-    fn scatter(&self, r: &Ray, hit: Hit<Dielectric>) -> Option<(Ray, Vec3)> {
+impl Scatterable for Dielectric {
+    fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         let reflected = mtl_utils::reflect(r.direction(), hit.n());
 
         let (out_norm, ni_nt, cos) = if r.direction().dot(hit.n()) > 0.0 {

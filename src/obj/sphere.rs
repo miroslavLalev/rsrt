@@ -2,20 +2,20 @@ use crate::math::Vec3;
 use crate::mtl::Scatterable;
 use crate::trace::{Hit, Hittable, Ray};
 
-pub struct Sphere<M: Scatterable<M>> {
+pub struct Sphere<M: Scatterable> {
     center: Vec3,
     r: f32,
     mat: M,
 }
 
-impl<M: Scatterable<M>> Sphere<M> {
+impl<M: Scatterable> Sphere<M> {
     pub fn new(center: Vec3, r: f32, mat: M) -> Sphere<M> {
         Sphere { center, r, mat }
     }
 }
 
-impl<M: Scatterable<M>> Hittable<M> for Sphere<M> {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit<M>> {
+impl<M: Scatterable> Hittable for Sphere<M> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let oc = r.origin() - self.center;
         let a = r.direction().dot(r.direction());
         let b = 2.0 * oc.dot(r.direction());

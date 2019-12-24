@@ -2,9 +2,9 @@ extern crate rsrt;
 
 use rsrt::math::Vec3;
 use rsrt::mtl::{Dielectric, Lambertian, Metal};
+use rsrt::obj::Sphere;
 use rsrt::trace::{Camera, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
-use rsrt::obj::Sphere;
 
 fn main() -> Result<(), std::io::Error> {
     let nx = 200;

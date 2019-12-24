@@ -19,8 +19,8 @@ impl Metal {
     }
 }
 
-impl Scatterable<Metal> for Metal {
-    fn scatter(&self, r: &Ray, hit: Hit<Metal>) -> Option<(Ray, Vec3)> {
+impl Scatterable for Metal {
+    fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         let reflected = mtl_utils::reflect(r.direction().as_unit(), hit.n());
         let scattered = Ray::new(hit.p(), reflected + self.fuzz * rand_in_unit_sphere());
         if scattered.direction().dot(hit.n()) > 0.0 {

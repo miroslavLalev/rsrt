@@ -2,15 +2,15 @@ use crate::math::Vec3;
 use crate::mtl::Scatterable;
 use crate::trace::Ray;
 
-pub struct Hit<'a, M: Scatterable<M>> {
+pub struct Hit<'a> {
     t: f32,  // from p(t) = A + t * B
     p: Vec3, // point_at_param(t)
     n: Vec3, // normal
-    mat: &'a M,
+    mat: &'a dyn Scatterable,
 }
 
-impl<'a, M: Scatterable<M>> Hit<'a, M> {
-    pub fn new(t: f32, p: Vec3, n: Vec3, mat: &'a M) -> Hit<M> {
+impl<'a> Hit<'a> {
+    pub fn new(t: f32, p: Vec3, n: Vec3, mat: &'a dyn Scatterable) -> Hit {
         Hit { t, p, n, mat }
     }
 
@@ -31,6 +31,6 @@ impl<'a, M: Scatterable<M>> Hit<'a, M> {
     }
 }
 
-pub trait Hittable<M: Scatterable<M>> {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit<M>>;
+pub trait Hittable {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
 }
