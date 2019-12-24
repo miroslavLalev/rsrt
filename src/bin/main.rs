@@ -7,10 +7,23 @@ use rsrt::trace::{Camera, HitVec, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
 
 fn main() -> Result<(), std::io::Error> {
-    let nx = 1200;
-    let ny = 600;
-    let ns = 20;
-    let cam = Camera::new();
+    let nx = 400;
+    let ny = 200;
+    let ns = 100;
+
+    let lookfrom = Vec3(3.0, 3.0, 2.0);
+    let lookat = Vec3(0.0, 0.0, -1.0);
+    let focus_dist = (lookfrom - lookat).len();
+    let aperture = 2.0;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        Vec3(0.0, 1.0, 0.0),
+        20.0,
+        nx as f32 / ny as f32,
+        aperture,
+        focus_dist,
+    );
 
     let hit_vec = HitVec::new(vec![
         Box::new(Sphere::new(
