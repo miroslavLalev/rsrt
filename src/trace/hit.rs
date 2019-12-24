@@ -34,3 +34,27 @@ impl<'a> Hit<'a> {
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
 }
+
+pub struct HitVec {
+    elements: Vec<Box<dyn Hittable>>,
+}
+
+impl HitVec {
+    pub fn new(elements: Vec<Box<dyn Hittable>>) -> HitVec {
+        HitVec { elements }
+    }
+}
+
+impl Hittable for HitVec {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+        let mut closest_t = t_max;
+        let mut last_hit = None;
+        for elem in &self.elements {
+            if let Some(hit) = elem.hit(r, t_min, closest_t) {
+                closest_t = hit.t;
+                last_hit = Some(hit);
+            }
+        }
+        last_hit
+    }
+}
