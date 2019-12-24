@@ -1,7 +1,6 @@
-use super::super::math::Vec3;
-use super::Ray;
-use super::Scatterable;
-use super::{Hit, Hittable};
+use crate::math::Vec3;
+use crate::mtl::Scatterable;
+use crate::trace::{Hit, Hittable, Ray};
 
 pub struct Sphere<M: Scatterable<M>> {
     center: Vec3,

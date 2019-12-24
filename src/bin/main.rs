@@ -1,13 +1,13 @@
 extern crate rsrt;
 
-use rand::Rng;
 use rsrt::math::Vec3;
-use rsrt::trace::{Camera, Dielectric, Hittable, Ray, Sphere};
-use rsrt::trace::{Lambertian, Metal};
+use rsrt::mtl::{Dielectric, Lambertian, Metal};
+use rsrt::trace::{Camera, Hittable, Ray, Sphere};
+use rsrt::utils::rng::uniform_in_range;
 
 fn main() -> Result<(), std::io::Error> {
-    let nx = 1200;
-    let ny = 600;
+    let nx = 200;
+    let ny = 100;
     let ns = 100;
     let cam = Camera::new();
 
@@ -15,8 +15,8 @@ fn main() -> Result<(), std::io::Error> {
     for (x, y, pixel) in buf.enumerate_pixels_mut() {
         let mut col = Vec3(0.0, 0.0, 0.0);
         for _ in 0..ns {
-            let u = (x as f32 + rand_float()) / nx as f32;
-            let v = ((ny - y) as f32 + rand_float()) / ny as f32;
+            let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
+            let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
 
             let r = cam.get_ray(u, v);
             col = col + color(r, 0);
@@ -31,11 +31,11 @@ fn main() -> Result<(), std::io::Error> {
         *pixel = image::Rgb([r, g, b]);
     }
 
-    buf.save_with_format(
-        "c://Users/User/Desktop/image2_fix.jpeg",
-        image::ImageFormat::JPEG,
-    )
-    //    buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
+    //    buf.save_with_format(
+    //        "c://Users/User/Desktop/image2_fix.jpeg",
+    //        image::ImageFormat::JPEG,
+    //    )
+    buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
 }
 
 fn color(r: Ray, depth: u8) -> Vec3 {
@@ -73,8 +73,4 @@ fn color(r: Ray, depth: u8) -> Vec3 {
     let unit = r.direction().as_unit();
     let t = 0.5 * (unit.1 + 1.0);
     (1.0 - t) * Vec3(0.0, 0.0, 0.0) + t * Vec3(0.7, 0.7, 0.7)
-}
-
-fn rand_float() -> f32 {
-    rand::thread_rng().gen_range(0.0, 1.0)
 }

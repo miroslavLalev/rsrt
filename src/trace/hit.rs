@@ -1,6 +1,6 @@
-use super::super::math::Vec3;
-use super::Ray;
-use super::Scatterable;
+use crate::math::Vec3;
+use crate::mtl::Scatterable;
+use crate::trace::Ray;
 
 pub struct Hit<'a, M: Scatterable<M>> {
     t: f32,  // from p(t) = A + t * B
