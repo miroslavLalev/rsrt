@@ -3,29 +3,18 @@ extern crate rsrt;
 use rsrt::math::Vec3;
 use rsrt::mtl::{Dielectric, Lambertian, Metal};
 use rsrt::obj::Sphere;
+use rsrt::strategy::Bucket;
 use rsrt::trace::{Camera, HitVec, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use threadpool::ThreadPool;
 
-#[derive(Debug)]
-struct Pixel {
-    color: Vec3,
-    x: u32,
-    y: u32,
-}
-
-impl Pixel {
-    fn new(color: Vec3, x: u32, y: u32) -> Pixel {
-        Pixel { color, x, y }
-    }
-}
-
 fn main() -> Result<(), std::io::Error> {
     let nx = 400;
     let ny = 200;
     let ns = 100;
+    let strategy = Bucket::new(nx, ny, 100);
 
     let lookfrom = Vec3(3.0, 3.0, 2.0);
     let lookat = Vec3(0.0, 0.0, -1.0);
@@ -69,37 +58,43 @@ fn main() -> Result<(), std::io::Error> {
         )),
     ]));
 
-    let pool = ThreadPool::new(8);
+    let pool = ThreadPool::new(4);
 
-    let pixels = Arc::new(Mutex::new(HashMap::new()));
+    let pixels_data = Arc::new(Mutex::new(HashMap::new()));
 
     let mut buf = image::ImageBuffer::new(nx, ny);
-    for (x, y, _) in buf.enumerate_pixels() {
+
+    for items in strategy {
         let cam = Arc::clone(&cam);
         let hit_vec = Arc::clone(&hit_vec);
-        let pixels = pixels.clone();
+        let pixels_data = pixels_data.clone();
+
         pool.execute(move || {
-            let mut col = Vec3(0.0, 0.0, 0.0);
-            for _ in 0..ns {
-                let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
-                let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
+            for (y, x) in items {
+                let mut col = Vec3(0.0, 0.0, 0.0);
+                for _ in 0..ns {
+                    let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
+                    let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
 
-                let r = cam.get_ray(u, v);
-                col = col + color(r, hit_vec.as_ref(), 0);
+                    let r = cam.get_ray(u, v);
+                    col = col + color(r, hit_vec.as_ref(), 0);
+                }
+                col = col / ns as f32;
+                col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
+
+                let mut pixels = pixels_data.lock().unwrap();
+                pixels.insert((x, y), col);
             }
-            col = col / ns as f32;
-            col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
-
-            let mut pixels = pixels.lock().unwrap();
-            pixels.insert((x, y), col);
         });
     }
 
     pool.join();
 
-    let mut pixels = pixels.lock().unwrap();
+    let pixels_data = pixels_data.lock().unwrap();
     for (x, y, pixel) in buf.enumerate_pixels_mut() {
-        let col = pixels.get(&(x, y)).expect("missing x,y in pixels map");
+        let col = pixels_data
+            .get(&(x, y))
+            .expect(format!("missing {}, {} in params", x, y).as_str());
 
         let r = (255.99 * col.0) as u8;
         let g = (255.99 * col.1) as u8;
