@@ -55,3 +55,6 @@ impl Camera {
         )
     }
 }
+
+// &Camera can be shared between threads.
+unsafe impl Sync for Camera {}

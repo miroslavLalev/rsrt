@@ -58,3 +58,7 @@ impl Hittable for HitVec {
         last_hit
     }
 }
+
+// &HitVec can be shared between threads.
+unsafe impl Send for HitVec {}
+unsafe impl Sync for HitVec {}

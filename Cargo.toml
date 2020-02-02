@@ -17,3 +17,4 @@ path = "src/bin/main.rs"
 [dependencies]
 image = "0.22.3"
 rand = "0.7.2"
+threadpool = "1.7.1"

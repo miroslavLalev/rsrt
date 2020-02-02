@@ -5,6 +5,22 @@ use rsrt::mtl::{Dielectric, Lambertian, Metal};
 use rsrt::obj::Sphere;
 use rsrt::trace::{Camera, HitVec, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use threadpool::ThreadPool;
+
+#[derive(Debug)]
+struct Pixel {
+    color: Vec3,
+    x: u32,
+    y: u32,
+}
+
+impl Pixel {
+    fn new(color: Vec3, x: u32, y: u32) -> Pixel {
+        Pixel { color, x, y }
+    }
+}
 
 fn main() -> Result<(), std::io::Error> {
     let nx = 400;
@@ -15,7 +31,7 @@ fn main() -> Result<(), std::io::Error> {
     let lookat = Vec3(0.0, 0.0, -1.0);
     let focus_dist = (lookfrom - lookat).len();
     let aperture = 2.0;
-    let cam = Camera::new(
+    let cam = Arc::new(Camera::new(
         lookfrom,
         lookat,
         Vec3(0.0, 1.0, 0.0),
@@ -23,9 +39,9 @@ fn main() -> Result<(), std::io::Error> {
         nx as f32 / ny as f32,
         aperture,
         focus_dist,
-    );
+    ));
 
-    let hit_vec = HitVec::new(vec![
+    let hit_vec = Arc::new(HitVec::new(vec![
         Box::new(Sphere::new(
             Vec3(0.0, 0.0, -1.0),
             0.5,
@@ -51,20 +67,39 @@ fn main() -> Result<(), std::io::Error> {
             -0.45,
             Dielectric::new(1.5),
         )),
-    ]);
+    ]));
+
+    let pool = ThreadPool::new(8);
+
+    let pixels = Arc::new(Mutex::new(HashMap::new()));
 
     let mut buf = image::ImageBuffer::new(nx, ny);
-    for (x, y, pixel) in buf.enumerate_pixels_mut() {
-        let mut col = Vec3(0.0, 0.0, 0.0);
-        for _ in 0..ns {
-            let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
-            let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
+    for (x, y, _) in buf.enumerate_pixels() {
+        let cam = Arc::clone(&cam);
+        let hit_vec = Arc::clone(&hit_vec);
+        let pixels = pixels.clone();
+        pool.execute(move || {
+            let mut col = Vec3(0.0, 0.0, 0.0);
+            for _ in 0..ns {
+                let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
+                let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
 
-            let r = cam.get_ray(u, v);
-            col = col + color(r, &hit_vec, 0);
-        }
-        col = col / ns as f32;
-        col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
+                let r = cam.get_ray(u, v);
+                col = col + color(r, hit_vec.as_ref(), 0);
+            }
+            col = col / ns as f32;
+            col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
+
+            let mut pixels = pixels.lock().unwrap();
+            pixels.insert((x, y), col);
+        });
+    }
+
+    pool.join();
+
+    let mut pixels = pixels.lock().unwrap();
+    for (x, y, pixel) in buf.enumerate_pixels_mut() {
+        let col = pixels.get(&(x, y)).expect("missing x,y in pixels map");
 
         let r = (255.99 * col.0) as u8;
         let g = (255.99 * col.1) as u8;
@@ -73,11 +108,11 @@ fn main() -> Result<(), std::io::Error> {
         *pixel = image::Rgb([r, g, b]);
     }
 
-    //    buf.save_with_format(
-    //        "c://Users/User/Desktop/image2_fix.jpeg",
-    //        image::ImageFormat::JPEG,
-    //    )
-    buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
+    buf.save_with_format(
+        "c://Users/User/Desktop/image2_fix.jpeg",
+        image::ImageFormat::JPEG,
+    )
+    // buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
 }
 
 fn color(r: Ray, hit_vec: &HitVec, depth: u8) -> Vec3 {
