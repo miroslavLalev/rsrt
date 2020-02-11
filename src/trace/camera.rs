@@ -1,7 +1,7 @@
 use crate::math::Vec3;
 use crate::trace::Ray;
 
-use crate::utils::rng::rand_in_unit_disk;
+use crate::utils::rng::{rand_in_unit_disk, uniform_in_range};
 
 pub struct Camera {
     origin: Vec3,
@@ -12,6 +12,8 @@ pub struct Camera {
     v: Vec3,
     w: Vec3,
     lens_radius: f32,
+    time_begin: f32,
+    time_end: f32,
 }
 
 impl Camera {
@@ -23,6 +25,8 @@ impl Camera {
         aspect: f32,
         aperture: f32,
         focus_dist: f32,
+        time_begin: f32,
+        time_end: f32,
     ) -> Camera {
         let thetha = fov * std::f32::consts::PI / 180.0;
         let half_height = (thetha / 2.0).tan();
@@ -43,6 +47,8 @@ impl Camera {
             v,
             w,
             lens_radius: aperture / 2.0,
+            time_begin,
+            time_end,
         }
     }
 
@@ -52,6 +58,7 @@ impl Camera {
         Ray::new(
             self.origin + offset,
             self.low_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
+            self.time_begin + uniform_in_range(0.0, 1.0) * (self.time_end - self.time_begin),
         )
     }
 }

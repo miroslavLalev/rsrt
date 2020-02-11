@@ -2,7 +2,7 @@ extern crate rsrt;
 
 use rsrt::math::Vec3;
 use rsrt::mtl::{Dielectric, Lambertian, Metal};
-use rsrt::obj::Sphere;
+use rsrt::obj::{MovSphere, Sphere};
 use rsrt::strategy::Bucket;
 use rsrt::trace::{Camera, HitVec, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
@@ -11,15 +11,15 @@ use std::sync::{Arc, Mutex};
 use threadpool::ThreadPool;
 
 fn main() -> Result<(), std::io::Error> {
-    let nx = 400;
-    let ny = 200;
+    let nx = 1200;
+    let ny = 800;
     let ns = 100;
     let strategy = Bucket::new(nx, ny, 100);
 
-    let lookfrom = Vec3(3.0, 3.0, 2.0);
-    let lookat = Vec3(0.0, 0.0, -1.0);
-    let focus_dist = (lookfrom - lookat).len();
-    let aperture = 2.0;
+    let lookfrom = Vec3(13.0, 2.0, 3.0);
+    let lookat = Vec3(0.0, 0.0, 0.0);
+    let focus_dist = 10.0;
+    let aperture = 0.0;
     let cam = Arc::new(Camera::new(
         lookfrom,
         lookat,
@@ -28,36 +28,61 @@ fn main() -> Result<(), std::io::Error> {
         nx as f32 / ny as f32,
         aperture,
         focus_dist,
+        0.0,
+        1.0,
     ));
 
-    let hit_vec = Arc::new(HitVec::new(vec![
-        Box::new(Sphere::new(
-            Vec3(0.0, 0.0, -1.0),
-            0.5,
-            Lambertian::new(Vec3(0.1, 0.2, 0.5)),
-        )),
-        Box::new(Sphere::new(
-            Vec3(0.0, -100.5, -1.0),
-            100.0,
-            Lambertian::new(Vec3(0.8, 0.8, 0.0)),
-        )),
-        Box::new(Sphere::new(
-            Vec3(1.0, 0.0, -1.0),
-            0.5,
-            Metal::new(Vec3(0.8, 0.6, 0.2), 0.3),
-        )),
-        Box::new(Sphere::new(
-            Vec3(-1.0, 0.0, -1.0),
-            0.5,
-            Dielectric::new(1.5),
-        )),
-        Box::new(Sphere::new(
-            Vec3(-1.0, 0.0, -1.0),
-            -0.45,
-            Dielectric::new(1.5),
-        )),
-    ]));
+    let mut spheres: Vec<Box<dyn Hittable>> = vec![Box::new(Sphere::new(
+        Vec3(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(Vec3(0.3, 0.3, 0.3)),
+    ))];
 
+
+    for a in -10..10 {
+        for b in -10..10 {
+            let choose_mat = uniform_in_range(0.0, 1.0);
+            let center = Vec3(
+                a as f32 + 0.9 * uniform_in_range(0.0, 1.0),
+                0.2,
+                b as f32 + 0.9 * uniform_in_range(0.0, 1.0),
+            );
+
+            if (center - Vec3(4.0, 0.2, 0.0)).len() > 0.9 {
+                if choose_mat < 0.8 {
+                    spheres.push(Box::new(MovSphere::new(
+                        center,
+                        0.0,
+                        center + Vec3(0.0, 0.5 * uniform_in_range(0.0, 1.0), 0.0),
+                        1.0,
+                        0.2,
+                        Lambertian::new(Vec3(
+                            uniform_in_range(0.0, 1.0) * uniform_in_range(0.0, 1.0),
+                            uniform_in_range(0.0, 1.0) * uniform_in_range(0.0, 1.0),
+                            uniform_in_range(0.0, 1.0) * uniform_in_range(0.0, 1.0),
+                        )),
+                    )))
+                } else if choose_mat < 0.95 {
+                    spheres.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Metal::new(
+                            Vec3(
+                                0.5 * (1.0 + uniform_in_range(0.0, 1.0)),
+                                0.5 * (1.0 + uniform_in_range(0.0, 1.0)),
+                                0.5 * (1.0 + uniform_in_range(0.0, 1.0)),
+                            ),
+                            0.5 * uniform_in_range(0.0, 1.0),
+                        ),
+                    )))
+                } else {
+                    spheres.push(Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5))))
+                }
+            }
+        }
+    }
+
+    let hit_vec = Arc::new(HitVec::new(spheres));
     let pool = ThreadPool::new(4);
 
     let pixels_data = Arc::new(Mutex::new(HashMap::new()));
@@ -104,7 +129,7 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/image2_fix.jpeg",
+        "c://Users/User/Desktop/much_spheres.jpeg",
         image::ImageFormat::JPEG,
     )
     // buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)

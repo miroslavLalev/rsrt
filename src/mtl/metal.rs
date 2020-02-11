@@ -22,7 +22,11 @@ impl Metal {
 impl Scatterable for Metal {
     fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         let reflected = mtl_utils::reflect(r.direction().as_unit(), hit.n());
-        let scattered = Ray::new(hit.p(), reflected + self.fuzz * rand_in_unit_sphere());
+        let scattered = Ray::new(
+            hit.p(),
+            reflected + self.fuzz * rand_in_unit_sphere(),
+            r.time(),
+        );
         if scattered.direction().dot(hit.n()) > 0.0 {
             Some((scattered, self.albedo))
         } else {

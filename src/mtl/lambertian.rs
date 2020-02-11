@@ -14,8 +14,8 @@ impl Lambertian {
 }
 
 impl Scatterable for Lambertian {
-    fn scatter(&self, _: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         let target = hit.p() + hit.n() + rand_in_unit_sphere();
-        Some((Ray::new(hit.p(), target - hit.p()), self.color))
+        Some((Ray::new(hit.p(), target - hit.p(), r.time()), self.color))
     }
 }

@@ -39,9 +39,9 @@ impl Scatterable for Dielectric {
         };
 
         if uniform_in_range(0.0, 1.0) < reflect_prob {
-            Some((Ray::new(hit.p(), reflected), Vec3(1.0, 1.0, 1.0)))
+            Some((Ray::new(hit.p(), reflected, r.time()), Vec3(1.0, 1.0, 1.0)))
         } else {
-            Some((Ray::new(hit.p(), refracted?), Vec3(1.0, 1.0, 1.0)))
+            Some((Ray::new(hit.p(), refracted?, r.time()), Vec3(1.0, 1.0, 1.0)))
         }
     }
 }

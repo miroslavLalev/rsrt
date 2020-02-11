@@ -59,6 +59,6 @@ impl Hittable for HitVec {
     }
 }
 
-// &HitVec can be shared between threads.
+// &HitVec can be shared between threads, as it can't be mutated after construction.
 unsafe impl Send for HitVec {}
 unsafe impl Sync for HitVec {}
