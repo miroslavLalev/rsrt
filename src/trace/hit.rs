@@ -1,5 +1,6 @@
 use crate::math::Vec3;
 use crate::mtl::Scatterable;
+use crate::obj::{surrounding_box, AABB};
 use crate::trace::Ray;
 
 pub struct Hit<'a> {
@@ -33,6 +34,7 @@ impl<'a> Hit<'a> {
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB>;
 }
 
 pub struct HitVec {
@@ -56,6 +58,17 @@ impl Hittable for HitVec {
             }
         }
         last_hit
+    }
+
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+        let mut iter = self.elements.iter();
+        let first_item = iter.next()?;
+        let mut tmp_box = first_item.bounding_box(t_min, t_max)?;
+
+        for item in iter {
+            tmp_box = surrounding_box(item.bounding_box(t_min, t_max)?, tmp_box);
+        }
+        Some(tmp_box)
     }
 }
 

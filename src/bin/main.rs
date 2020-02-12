@@ -38,7 +38,6 @@ fn main() -> Result<(), std::io::Error> {
         Lambertian::new(Vec3(0.3, 0.3, 0.3)),
     ))];
 
-
     for a in -10..10 {
         for b in -10..10 {
             let choose_mat = uniform_in_range(0.0, 1.0);

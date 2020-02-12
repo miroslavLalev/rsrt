@@ -1,5 +1,6 @@
 use crate::math::Vec3;
 use crate::mtl::Scatterable;
+use crate::obj::{surrounding_box, AABB};
 use crate::trace::{Hit, Hittable, Ray};
 
 pub struct MovSphere<M: Scatterable> {
@@ -71,5 +72,18 @@ impl<M: Scatterable> Hittable for MovSphere<M> {
         }
 
         None
+    }
+
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+        let box_begin = AABB::new(
+            self.center_begin - Vec3(self.r, self.r, self.r),
+            self.center_begin + Vec3(self.r, self.r, self.r),
+        );
+        let box_end = AABB::new(
+            self.center_end - Vec3(self.r, self.r, self.r),
+            self.center_end + Vec3(self.r, self.r, self.r),
+        );
+
+        Some(surrounding_box(box_begin, box_end))
     }
 }

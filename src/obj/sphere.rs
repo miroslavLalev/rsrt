@@ -1,5 +1,6 @@
 use crate::math::Vec3;
 use crate::mtl::Scatterable;
+use crate::obj::AABB;
 use crate::trace::{Hit, Hittable, Ray};
 
 pub struct Sphere<M: Scatterable> {
@@ -38,5 +39,12 @@ impl<M: Scatterable> Hittable for Sphere<M> {
         }
 
         None
+    }
+
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+        Some(AABB::new(
+            self.center - Vec3(self.r, self.r, self.r),
+            self.center + Vec3(self.r, self.r, self.r),
+        ))
     }
 }
