@@ -8,11 +8,15 @@ pub struct Hit<'a> {
     p: Vec3, // point_at_param(t)
     n: Vec3, // normal
     mat: &'a dyn Scatterable,
+
+    // for texture mapping
+    u: f32,
+    v: f32,
 }
 
 impl<'a> Hit<'a> {
-    pub fn new(t: f32, p: Vec3, n: Vec3, mat: &'a dyn Scatterable) -> Hit {
-        Hit { t, p, n, mat }
+    pub fn new(t: f32, p: Vec3, n: Vec3, mat: &'a dyn Scatterable, u: f32, v: f32) -> Hit {
+        Hit { t, p, n, mat, u, v }
     }
 
     pub fn t(&self) -> f32 {
@@ -25,6 +29,18 @@ impl<'a> Hit<'a> {
 
     pub fn n(&self) -> Vec3 {
         self.n
+    }
+
+    pub fn u(&self) -> f32 {
+        self.u
+    }
+
+    pub fn v(&self) -> f32 {
+        self.v
+    }
+
+    pub fn mat_ref(&self) -> &'a dyn Scatterable {
+        self.mat
     }
 
     pub fn scatter(self, r: &Ray) -> Option<(Ray, Vec3)> {

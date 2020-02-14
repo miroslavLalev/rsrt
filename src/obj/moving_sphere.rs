@@ -1,6 +1,6 @@
 use crate::math::Vec3;
 use crate::mtl::Scatterable;
-use crate::obj::{surrounding_box, AABB};
+use crate::obj::{surrounding_box, Sphere, AABB};
 use crate::trace::{Hit, Hittable, Ray};
 
 pub struct MovSphere<M: Scatterable> {
@@ -52,21 +52,27 @@ impl<M: Scatterable> Hittable for MovSphere<M> {
         let tmp = (-b - disc.sqrt()) / (2.0 * a);
         if tmp < t_max && tmp > t_min {
             let p = r.point_at_param(tmp);
+            let (u, v) = Sphere::<M>::get_uv((p - self.center(r.time())) / self.r);
             return Some(Hit::new(
                 tmp,
                 p,
                 (p - self.center(r.time())) / self.r,
                 &self.mat,
+                u,
+                v,
             ));
         } else {
             let tmp = (-b + disc.sqrt()) / (2.0 * a);
             if tmp < t_max && tmp > t_min {
                 let p = r.point_at_param(tmp);
+                let (u, v) = Sphere::<M>::get_uv((p - self.center(r.time())) / self.r);
                 return Some(Hit::new(
                     tmp,
                     p,
                     (p - self.center(r.time())) / self.r,
                     &self.mat,
+                    u,
+                    v,
                 ));
             }
         }

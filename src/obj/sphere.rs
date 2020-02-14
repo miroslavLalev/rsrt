@@ -13,6 +13,15 @@ impl<M: Scatterable> Sphere<M> {
     pub fn new(center: Vec3, r: f32, mat: M) -> Sphere<M> {
         Sphere { center, r, mat }
     }
+
+    pub fn get_uv(p: Vec3) -> (f32, f32) {
+        let phi = p.2.atan2(p.0);
+        let theta = p.1.asin();
+        (
+            1.0 - (phi + std::f32::consts::PI) / (2.0 * std::f32::consts::PI),
+            (theta + std::f32::consts::PI / 2.0) / std::f32::consts::PI,
+        )
+    }
 }
 
 impl<M: Scatterable> Hittable for Sphere<M> {
@@ -29,12 +38,28 @@ impl<M: Scatterable> Hittable for Sphere<M> {
         let tmp = (-b - disc.sqrt()) / (2.0 * a);
         if tmp < t_max && tmp > t_min {
             let p = r.point_at_param(tmp);
-            return Some(Hit::new(tmp, p, (p - self.center) / self.r, &self.mat));
+            let (u, v) = Self::get_uv((p - self.center) / self.r);
+            return Some(Hit::new(
+                tmp,
+                p,
+                (p - self.center) / self.r,
+                &self.mat,
+                u,
+                v,
+            ));
         } else {
             let tmp = (-b + disc.sqrt()) / (2.0 * a);
             if tmp < t_max && tmp > t_min {
                 let p = r.point_at_param(tmp);
-                return Some(Hit::new(tmp, p, (p - self.center) / self.r, &self.mat));
+                let (u, v) = Self::get_uv((p - self.center) / self.r);
+                return Some(Hit::new(
+                    tmp,
+                    p,
+                    (p - self.center) / self.r,
+                    &self.mat,
+                    u,
+                    v,
+                ));
             }
         }
 
