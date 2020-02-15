@@ -1,3 +1,4 @@
+pub use bvh::BVHNode;
 pub use camera::Camera;
 pub use hit::{Hit, HitVec, Hittable};
 pub use ray::Ray;

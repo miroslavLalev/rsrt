@@ -10,7 +10,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
-    fn new(elements: Vec<Rc<dyn Hittable>>, time_begin: f32, time_end: f32) -> BVHNode {
+    pub fn new(elements: Vec<Rc<dyn Hittable>>, time_begin: f32, time_end: f32) -> BVHNode {
         let mut elements = elements;
 
         let axis = (3.0 * uniform_in_range(0.0, 1.0)) as i32;

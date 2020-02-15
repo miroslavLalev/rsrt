@@ -73,3 +73,44 @@ impl<M: Scatterable> Hittable for Sphere<M> {
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sphere_hit() {
+        let s = Sphere::new(Vec3(1.0, 1.0, 1.0), 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0), 0.0);
+        let res = s.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_some());
+    }
+
+    #[test]
+    fn test_sphere_miss() {
+        let s = Sphere::new(Vec3(1.0, 1.0, 1.0), 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(-1.0, -1.0, -1.0), 0.0);
+        let res = s.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_none());
+    }
+
+    #[test]
+    fn test_sphere_bbox() {
+        let s = Sphere::new(Vec3(1.0, 1.0, 1.0), 1.0, TestMaterial { res: None });
+        let bbox = s
+            .bounding_box(0.0, 0.0)
+            .expect("bbox for sphere should always defined");
+        assert_eq!(bbox.min(), Vec3(0.0, 0.0, 0.0));
+        assert_eq!(bbox.max(), Vec3(2.0, 2.0, 2.0));
+    }
+
+    struct TestMaterial {
+        res: Option<(Ray, Vec3)>,
+    }
+
+    impl Scatterable for TestMaterial {
+        fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
+            None
+        }
+    }
+}

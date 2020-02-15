@@ -198,18 +198,4 @@ mod tests {
         assert_eq!(bucket.next(), None);
         assert_eq!(bucket.next(), None);
     }
-
-    #[test]
-    fn test_buckets_remainder() {
-        let mut bucket = Bucket::new(10, 10, 9);
-
-        // TODO: Fix that test its perfect :)
-        println!("{:?}", bucket.next());
-        println!("{:?}", bucket.next());
-        println!("{:?}", bucket.next());
-        println!("{:?}", bucket.next());
-        println!("{:?}", bucket.next());
-
-        unreachable!();
-    }
 }

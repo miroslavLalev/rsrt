@@ -28,3 +28,15 @@ impl Ray {
         self.a + t * self.b
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ray_pp() {
+        let r = Ray::new(Vec3(1.0, 1.0, 1.0), Vec3(1.5, 1.5, 1.5), 0.0);
+
+        assert_eq!(r.point_at_param(2.0), Vec3(4.0, 4.0, 4.0));
+    }
+}

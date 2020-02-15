@@ -172,3 +172,66 @@ impl<M: Scatterable> Hittable for YZRect<M> {
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_xy_rect_hit() {
+        let rect = XYRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_some());
+    }
+
+    #[test]
+    fn test_xz_rect_hit() {
+        let rect = XZRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_some());
+    }
+
+    #[test]
+    fn test_yz_rect_hit() {
+        let rect = YZRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_some());
+    }
+
+    #[test]
+    fn test_xy_rect_miss() {
+        let rect = XYRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(-1.0, -1.0, -1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_none());
+    }
+
+    #[test]
+    fn test_xz_rect_miss() {
+        let rect = XZRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(-1.0, -1.0, -1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_none());
+    }
+
+    #[test]
+    fn test_yz_rect_miss() {
+        let rect = YZRect::new(-1.0, -1.0, 1.0, 1.0, 1.0, TestMaterial { res: None });
+        let ray = Ray::new(Vec3(0.0, 0.0, 0.0), Vec3(-1.0, -1.0, -1.0), 0.0);
+        let res = rect.hit(&ray, 0.0, 1.0);
+        assert_eq!(true, res.is_none());
+    }
+
+    struct TestMaterial {
+        res: Option<(Ray, Vec3)>,
+    }
+
+    impl Scatterable for TestMaterial {
+        fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
+            None
+        }
+    }
+}

@@ -22,18 +22,18 @@ impl Wrappable for ConstTexture {
     }
 }
 
-pub struct CheckerTexture {
-    t0: Box<dyn Wrappable>,
-    t1: Box<dyn Wrappable>,
+pub struct CheckerTexture<W1: Wrappable, W2: Wrappable> {
+    t0: W1,
+    t1: W2,
 }
 
-impl CheckerTexture {
-    pub fn new(t0: Box<dyn Wrappable>, t1: Box<dyn Wrappable>) -> CheckerTexture {
+impl<W1: Wrappable, W2: Wrappable> CheckerTexture<W1, W2> {
+    pub fn new(t0: W1, t1: W2) -> CheckerTexture<W1, W2> {
         CheckerTexture { t0, t1 }
     }
 }
 
-impl Wrappable for CheckerTexture {
+impl<W1: Wrappable, W2: Wrappable> Wrappable for CheckerTexture<W1, W2> {
     fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
         let sines = (10.0 * p.0).sin() * (10.0 * p.1).sin() * (10.0 * p.2).sin();
         if sines < 0.0 {
