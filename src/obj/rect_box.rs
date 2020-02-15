@@ -1,9 +1,9 @@
 use crate::math::Vec3;
 use crate::mtl::Scatterable;
+use crate::obj::transform::FlipNormals;
 use crate::obj::{XYRect, XZRect, YZRect, AABB};
 use crate::trace::{Hit, HitVec, Hittable, Ray};
 use std::rc::Rc;
-use crate::obj::transform::FlipNormals;
 
 pub struct RectBox<M: Scatterable> {
     p_min: Vec3,

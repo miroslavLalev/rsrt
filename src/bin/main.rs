@@ -8,7 +8,7 @@ use threadpool::ThreadPool;
 use rsrt::math::Vec3;
 use rsrt::mtl::{Dielectric, Lambertian, LightDiffuse, Metal};
 use rsrt::obj::transform::{FlipNormals, RotateY, Translate};
-use rsrt::obj::{MovSphere, RectBox, Sphere, XYRect, XZRect, YZRect};
+use rsrt::obj::{ConstDensity, MovSphere, RectBox, Sphere, XYRect, XZRect, YZRect};
 use rsrt::strategy::Bucket;
 use rsrt::tex::{CheckerTexture, ConstTexture, ImageTexture};
 use rsrt::trace::{Camera, HitVec, Hittable, Ray};
@@ -136,7 +136,7 @@ fn main() -> Result<(), std::io::Error> {
     let green = Lambertian::new(ConstTexture::new(Vec3(0.12, 0.45, 0.15)));
     let light = LightDiffuse::new(Box::new(ConstTexture::new(Vec3(15.0, 15.0, 15.0))));
 
-    let spheres: Vec<Box<dyn Hittable>> = vec![
+    let mut spheres: Vec<Box<dyn Hittable>> = vec![
         Box::new(FlipNormals::new(Box::new(YZRect::new(
             0.0, 0.0, 555.0, 555.0, 555.0, green,
         )))),
@@ -169,29 +169,41 @@ fn main() -> Result<(), std::io::Error> {
         //            Vec3(430.0, 330.0, 460.0),
         //            white.clone(),
         //        )),
-        Box::new(Translate::new(
-            Box::new(RotateY::new(
-                Box::new(RectBox::new(
-                    Vec3(0.0, 0.0, 0.0),
-                    Vec3(165.0, 165.0, 165.0),
-                    white.clone(),
-                )),
-                -18.0,
-            )),
-            Vec3(130.0, 0.0, 65.0),
-        )),
-        Box::new(Translate::new(
-            Box::new(RotateY::new(
-                Box::new(RectBox::new(
-                    Vec3(0.0, 0.0, 0.0),
-                    Vec3(165.0, 330.0, 165.0),
-                    white.clone(),
-                )),
-                15.0,
-            )),
-            Vec3(265.0, 0.0, 295.0),
-        )),
     ];
+
+    let b1 = Translate::new(
+        Box::new(RotateY::new(
+            Box::new(RectBox::new(
+                Vec3(0.0, 0.0, 0.0),
+                Vec3(165.0, 165.0, 165.0),
+                white.clone(),
+            )),
+            -18.0,
+        )),
+        Vec3(130.0, 0.0, 65.0),
+    );
+    let b2 = Translate::new(
+        Box::new(RotateY::new(
+            Box::new(RectBox::new(
+                Vec3(0.0, 0.0, 0.0),
+                Vec3(165.0, 330.0, 165.0),
+                white.clone(),
+            )),
+            15.0,
+        )),
+        Vec3(265.0, 0.0, 295.0),
+    );
+
+    spheres.push(Box::new(ConstDensity::new(
+        b1,
+        0.01,
+        Lambertian::new(ConstTexture::new(Vec3(1.0, 1.0, 1.0))),
+    )));
+    spheres.push(Box::new(ConstDensity::new(
+        b2,
+        0.01,
+        Lambertian::new(ConstTexture::new(Vec3(0.0, 0.0, 0.0))),
+    )));
 
     let hit_vec = Arc::new(HitVec::new(spheres));
     let pool = ThreadPool::new(4);
@@ -244,7 +256,7 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/cornell_full.jpeg",
+        "c://Users/User/Desktop/cornell_dense.jpeg",
         image::ImageFormat::JPEG,
     )
     // buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)
