@@ -33,7 +33,7 @@ impl<M: Scatterable> MovSphere<M> {
 
     fn center(&self, time: f32) -> Vec3 {
         self.center_begin
-            + ((time - self.time_begin) / (self.time_end / self.time_begin))
+            + ((time - self.time_begin) / (self.time_end - self.time_begin))
                 * (self.center_end - self.center_begin)
     }
 }
