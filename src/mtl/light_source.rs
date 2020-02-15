@@ -3,17 +3,17 @@ use crate::mtl::Scatterable;
 use crate::tex::Wrappable;
 use crate::trace::{Hit, Ray};
 
-pub struct LightDiffuse {
-    emit: Box<dyn Wrappable>,
+pub struct LightDiffuse<W: Wrappable> {
+    emit: W,
 }
 
-impl LightDiffuse {
-    pub fn new(emit: Box<dyn Wrappable>) -> LightDiffuse {
+impl<W: Wrappable> LightDiffuse<W> {
+    pub fn new(emit: W) -> LightDiffuse<W> {
         LightDiffuse { emit }
     }
 }
 
-impl Scatterable for LightDiffuse {
+impl<W: Wrappable> Scatterable for LightDiffuse<W> {
     fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         None
     }

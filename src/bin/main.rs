@@ -134,31 +134,31 @@ fn main() -> Result<(), std::io::Error> {
     let red = Lambertian::new(ConstTexture::new(Vec3(0.65, 0.05, 0.05)));
     let white = Lambertian::new(ConstTexture::new(Vec3(0.73, 0.73, 0.73)));
     let green = Lambertian::new(ConstTexture::new(Vec3(0.12, 0.45, 0.15)));
-    let light = LightDiffuse::new(Box::new(ConstTexture::new(Vec3(15.0, 15.0, 15.0))));
+    let light = LightDiffuse::new(ConstTexture::new(Vec3(15.0, 15.0, 15.0)));
 
     let mut spheres: Vec<Box<dyn Hittable>> = vec![
-        Box::new(FlipNormals::new(Box::new(YZRect::new(
+        Box::new(FlipNormals::new(YZRect::new(
             0.0, 0.0, 555.0, 555.0, 555.0, green,
-        )))),
+        ))),
         Box::new(YZRect::new(0.0, 0.0, 555.0, 555.0, 0.0, red)),
         Box::new(XZRect::new(213.0, 227.0, 343.0, 332.0, 554.0, light)),
-        Box::new(FlipNormals::new(Box::new(XZRect::new(
+        Box::new(FlipNormals::new(XZRect::new(
             0.0,
             0.0,
             555.0,
             555.0,
             555.0,
             white.clone(),
-        )))),
+        ))),
         Box::new(XZRect::new(0.0, 0.0, 555.0, 555.0, 0.0, white.clone())),
-        Box::new(FlipNormals::new(Box::new(XYRect::new(
+        Box::new(FlipNormals::new(XYRect::new(
             0.0,
             0.0,
             555.0,
             555.0,
             555.0,
             white.clone(),
-        )))),
+        ))),
         //        Box::new(RectBox::new(
         //            Vec3(130.0, 0.0, 65.0),
         //            Vec3(295.0, 165.0, 230.0),
@@ -172,25 +172,25 @@ fn main() -> Result<(), std::io::Error> {
     ];
 
     let b1 = Translate::new(
-        Box::new(RotateY::new(
-            Box::new(RectBox::new(
+        RotateY::new(
+            RectBox::new(
                 Vec3(0.0, 0.0, 0.0),
                 Vec3(165.0, 165.0, 165.0),
                 white.clone(),
-            )),
+            ),
             -18.0,
-        )),
+        ),
         Vec3(130.0, 0.0, 65.0),
     );
     let b2 = Translate::new(
-        Box::new(RotateY::new(
-            Box::new(RectBox::new(
+        RotateY::new(
+            RectBox::new(
                 Vec3(0.0, 0.0, 0.0),
                 Vec3(165.0, 330.0, 165.0),
                 white.clone(),
-            )),
+            ),
             15.0,
-        )),
+        ),
         Vec3(265.0, 0.0, 295.0),
     );
 

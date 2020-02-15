@@ -2,18 +2,18 @@ use crate::math::Vec3;
 use crate::obj::AABB;
 use crate::trace::{Hit, Hittable, Ray};
 
-pub struct Translate {
-    hittable: Box<dyn Hittable>,
+pub struct Translate<H: Hittable> {
+    hittable: H,
     offset: Vec3,
 }
 
-impl Translate {
-    pub fn new(hittable: Box<dyn Hittable>, offset: Vec3) -> Translate {
+impl<H: Hittable> Translate<H> {
+    pub fn new(hittable: H, offset: Vec3) -> Translate<H> {
         Translate { hittable, offset }
     }
 }
 
-impl Hittable for Translate {
+impl<H: Hittable> Hittable for Translate<H> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let moved_ray = Ray::new(r.origin() - self.offset, r.direction(), r.time());
         if let Some(hit) = self.hittable.hit(&moved_ray, t_min, t_max) {

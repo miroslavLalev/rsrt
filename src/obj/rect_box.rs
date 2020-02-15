@@ -24,14 +24,14 @@ impl<M: Scatterable + Clone + 'static> RectBox<M> {
             p_max.2,
             mat.clone(),
         )));
-        sides.push(Box::new(FlipNormals::new(Box::new(XYRect::new(
+        sides.push(Box::new(FlipNormals::new(XYRect::new(
             p_min.0,
             p_min.1,
             p_max.0,
             p_max.1,
             p_min.2,
             mat.clone(),
-        )))));
+        ))));
         sides.push(Box::new(XZRect::new(
             p_min.0,
             p_min.2,
@@ -40,14 +40,14 @@ impl<M: Scatterable + Clone + 'static> RectBox<M> {
             p_max.1,
             mat.clone(),
         )));
-        sides.push(Box::new(FlipNormals::new(Box::new(XZRect::new(
+        sides.push(Box::new(FlipNormals::new(XZRect::new(
             p_min.0,
             p_min.2,
             p_max.0,
             p_max.2,
             p_min.1,
             mat.clone(),
-        )))));
+        ))));
         sides.push(Box::new(YZRect::new(
             p_min.1,
             p_min.2,
@@ -56,14 +56,14 @@ impl<M: Scatterable + Clone + 'static> RectBox<M> {
             p_max.0,
             mat.clone(),
         )));
-        sides.push(Box::new(FlipNormals::new(Box::new(YZRect::new(
+        sides.push(Box::new(FlipNormals::new(YZRect::new(
             p_min.1,
             p_min.2,
             p_max.1,
             p_max.2,
             p_min.0,
             mat.clone(),
-        )))));
+        ))));
 
         RectBox {
             p_min,

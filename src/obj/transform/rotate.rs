@@ -2,15 +2,15 @@ use crate::math::Vec3;
 use crate::obj::AABB;
 use crate::trace::{Hit, Hittable, Ray};
 
-pub struct RotateY {
-    hittable: Box<dyn Hittable>,
+pub struct RotateY<H: Hittable> {
+    hittable: H,
     sin_theta: f32,
     cos_theta: f32,
     bbox: Option<AABB>,
 }
 
-impl RotateY {
-    pub fn new(hittable: Box<dyn Hittable>, angle: f32) -> RotateY {
+impl<H: Hittable> RotateY<H> {
+    pub fn new(hittable: H, angle: f32) -> RotateY<H> {
         let rad = (std::f32::consts::PI / 180.0) * angle;
         let sin_theta = rad.sin();
         let cos_theta = rad.cos();
@@ -62,7 +62,7 @@ impl RotateY {
     }
 }
 
-impl Hittable for RotateY {
+impl<H: Hittable> Hittable for RotateY<H> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let mut origin = r.origin();
         origin.0 = self.cos_theta * r.origin().0 - self.sin_theta * r.origin().2;
