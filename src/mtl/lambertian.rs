@@ -4,17 +4,18 @@ use crate::tex::Wrappable;
 use crate::trace::{Hit, Ray};
 use crate::utils::rng::rand_in_unit_sphere;
 
-pub struct Lambertian {
-    albedo: Box<dyn Wrappable>,
+#[derive(Clone)]
+pub struct Lambertian<W: Wrappable> {
+    albedo: W,
 }
 
-impl Lambertian {
-    pub fn new(albedo: Box<dyn Wrappable>) -> Lambertian {
+impl<W: Wrappable> Lambertian<W> {
+    pub fn new(albedo: W) -> Lambertian<W> {
         Lambertian { albedo }
     }
 }
 
-impl Scatterable for Lambertian {
+impl<W: Wrappable> Scatterable for Lambertian<W> {
     fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
         let target = hit.p() + hit.n() + rand_in_unit_sphere();
         Some((

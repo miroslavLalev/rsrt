@@ -7,27 +7,44 @@ use threadpool::ThreadPool;
 
 use rsrt::math::Vec3;
 use rsrt::mtl::{Dielectric, Lambertian, LightDiffuse, Metal};
-use rsrt::obj::{MovSphere, Rect, Sphere};
+use rsrt::obj::transform::{FlipNormals, RotateY, Translate};
+use rsrt::obj::{MovSphere, RectBox, Sphere, XYRect, XZRect, YZRect};
 use rsrt::strategy::Bucket;
 use rsrt::tex::{CheckerTexture, ConstTexture, ImageTexture};
 use rsrt::trace::{Camera, HitVec, Hittable, Ray};
 use rsrt::utils::rng::uniform_in_range;
 
 fn main() -> Result<(), std::io::Error> {
-    let nx = 1200;
-    let ny = 800;
+    let nx = 555;
+    let ny = 555;
     let ns = 1000;
-    let strategy = Bucket::new(nx, ny, 4);
+    let strategy = Bucket::new(nx, ny, 24);
 
-    let lookfrom = Vec3(20.0, 2.0, 3.0);
-    let lookat = Vec3(0.0, 0.0, 0.0);
+    //    let lookfrom = Vec3(20.0, 2.0, 3.0);
+    //    let lookat = Vec3(0.0, 0.0, 0.0);
+    //    let focus_dist = 10.0;
+    //    let aperture = 0.0;
+    //    let cam = Arc::new(Camera::new(
+    //        lookfrom,
+    //        lookat,
+    //        Vec3(0.0, 1.0, 0.0),
+    //        20.0,
+    //        nx as f32 / ny as f32,
+    //        aperture,
+    //        focus_dist,
+    //        0.0,
+    //        1.0,
+    //    ));
+
+    let lookfrom = Vec3(278.0, 278.0, -800.0);
+    let lookat = Vec3(278.0, 278.0, 0.0);
     let focus_dist = 10.0;
     let aperture = 0.0;
     let cam = Arc::new(Camera::new(
         lookfrom,
         lookat,
         Vec3(0.0, 1.0, 0.0),
-        20.0,
+        40.0,
         nx as f32 / ny as f32,
         aperture,
         focus_dist,
@@ -87,27 +104,92 @@ fn main() -> Result<(), std::io::Error> {
     //        }
     //    }
 
-    let img_bytes = include_bytes!("earthmap.jpg");
-    let img = image::load_from_memory(img_bytes.as_ref()).expect("failed to load image");
+    //    let img_bytes = include_bytes!("earthmap.jpg");
+    //    let img = image::load_from_memory(img_bytes.as_ref()).expect("failed to load image");
+    //
+    //    let spheres: Vec<Box<dyn Hittable>> = vec![
+    //        Box::new(Sphere::new(
+    //            Vec3(0.0, 0.0, 0.0),
+    //            2.0,
+    //            Lambertian::new(Box::new(ImageTexture::new(img))),
+    //        )),
+    //        Box::new(XYRect::new(
+    //            -2.0,
+    //            -2.0,
+    //            2.0,
+    //            2.0,
+    //            -4.0,
+    //            LightDiffuse::new(Box::new(CheckerTexture::new(
+    //                Box::new(ConstTexture::new(Vec3(0.0, 1.0, 1.0))),
+    //                Box::new(ConstTexture::new(Vec3(1.0, 1.0, 0.0))),
+    //            ))),
+    //        )),
+    //        Box::new(Sphere::new(
+    //            Vec3(6.0, 3.0, 3.0),
+    //            0.5,
+    //            LightDiffuse::new(Box::new(ConstTexture::new(Vec3(1.0, 1.0, 0.0)))),
+    //        )),
+    //    ];
+
+    let red = Lambertian::new(ConstTexture::new(Vec3(0.65, 0.05, 0.05)));
+    let white = Lambertian::new(ConstTexture::new(Vec3(0.73, 0.73, 0.73)));
+    let green = Lambertian::new(ConstTexture::new(Vec3(0.12, 0.45, 0.15)));
+    let light = LightDiffuse::new(Box::new(ConstTexture::new(Vec3(15.0, 15.0, 15.0))));
 
     let spheres: Vec<Box<dyn Hittable>> = vec![
-        Box::new(Sphere::new(
-            Vec3(0.0, 0.0, 0.0),
-            2.0,
-            Lambertian::new(Box::new(ImageTexture::new(img))),
+        Box::new(FlipNormals::new(Box::new(YZRect::new(
+            0.0, 0.0, 555.0, 555.0, 555.0, green,
+        )))),
+        Box::new(YZRect::new(0.0, 0.0, 555.0, 555.0, 0.0, red)),
+        Box::new(XZRect::new(213.0, 227.0, 343.0, 332.0, 554.0, light)),
+        Box::new(FlipNormals::new(Box::new(XZRect::new(
+            0.0,
+            0.0,
+            555.0,
+            555.0,
+            555.0,
+            white.clone(),
+        )))),
+        Box::new(XZRect::new(0.0, 0.0, 555.0, 555.0, 0.0, white.clone())),
+        Box::new(FlipNormals::new(Box::new(XYRect::new(
+            0.0,
+            0.0,
+            555.0,
+            555.0,
+            555.0,
+            white.clone(),
+        )))),
+        //        Box::new(RectBox::new(
+        //            Vec3(130.0, 0.0, 65.0),
+        //            Vec3(295.0, 165.0, 230.0),
+        //            white.clone(),
+        //        )),
+        //        Box::new(RectBox::new(
+        //            Vec3(265.0, 0.0, 295.0),
+        //            Vec3(430.0, 330.0, 460.0),
+        //            white.clone(),
+        //        )),
+        Box::new(Translate::new(
+            Box::new(RotateY::new(
+                Box::new(RectBox::new(
+                    Vec3(0.0, 0.0, 0.0),
+                    Vec3(165.0, 165.0, 165.0),
+                    white.clone(),
+                )),
+                -18.0,
+            )),
+            Vec3(130.0, 0.0, 65.0),
         )),
-        Box::new(Rect::new(
-            -2.0,
-            -2.0,
-            2.0,
-            2.0,
-            -4.0,
-            LightDiffuse::new(Box::new(ConstTexture::new(Vec3(0.0, 4.0, 4.0)))),
-        )),
-        Box::new(Sphere::new(
-            Vec3(6.0, 3.0, 3.0),
-            0.5,
-            LightDiffuse::new(Box::new(ConstTexture::new(Vec3(4.0, 4.0, 0.0)))),
+        Box::new(Translate::new(
+            Box::new(RotateY::new(
+                Box::new(RectBox::new(
+                    Vec3(0.0, 0.0, 0.0),
+                    Vec3(165.0, 330.0, 165.0),
+                    white.clone(),
+                )),
+                15.0,
+            )),
+            Vec3(265.0, 0.0, 295.0),
         )),
     ];
 
@@ -134,7 +216,11 @@ fn main() -> Result<(), std::io::Error> {
                     col = col + color(r, hit_vec.as_ref(), 0);
                 }
                 col = col / ns as f32;
-                col = Vec3(col.0.sqrt(), col.1.sqrt(), col.2.sqrt());
+                col = Vec3(
+                    col.0.sqrt().min(1.0),
+                    col.1.sqrt().min(1.0),
+                    col.2.sqrt().min(1.0),
+                );
 
                 let mut pixels = pixels_data.lock().unwrap();
                 pixels.insert((x, y), col);
@@ -158,7 +244,7 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/earth_dark.jpeg",
+        "c://Users/User/Desktop/cornell_full.jpeg",
         image::ImageFormat::JPEG,
     )
     // buf.save_with_format("/Users/miro/Desktop/image", image::ImageFormat::JPEG)

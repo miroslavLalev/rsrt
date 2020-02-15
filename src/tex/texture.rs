@@ -5,6 +5,7 @@ pub trait Wrappable {
     fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3;
 }
 
+#[derive(Clone)]
 pub struct ConstTexture {
     color: Vec3,
 }
@@ -43,6 +44,7 @@ impl Wrappable for CheckerTexture {
     }
 }
 
+#[derive(Clone)]
 pub struct ImageTexture {
     image: DynamicImage,
 }
