@@ -104,6 +104,12 @@ impl std::ops::Neg for Vec3 {
     }
 }
 
+impl std::fmt::Display for Vec3 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(f, "({}, {}, {})", self.0, self.1, self.2)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

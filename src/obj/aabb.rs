@@ -2,7 +2,7 @@ use crate::math::Vec3;
 use crate::trace::Ray;
 
 // AABB represents axis-aligned boundig box
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct AABB {
     min: Vec3,
     max: Vec3,

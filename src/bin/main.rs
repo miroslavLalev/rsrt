@@ -19,6 +19,7 @@ fn main() -> Result<(), std::io::Error> {
     let nx = 1000;
     let ny = 1000;
     let ns = 100;
+    let nthreshold = 0.005;
     let strategy = Bucket::new(nx, ny, 4);
 
     let (cam, hit_vec) = prepare_scene(nx, ny);
@@ -38,15 +39,23 @@ fn main() -> Result<(), std::io::Error> {
 
         pool.execute(move || {
             for (y, x) in items {
+                let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
+                let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
                 let mut col = Vec3(0.0, 0.0, 0.0);
-                for _ in 0..ns {
-                    let u = (x as f32 + uniform_in_range(0.0, 1.0)) / nx as f32;
-                    let v = ((ny - y) as f32 + uniform_in_range(0.0, 1.0)) / ny as f32;
-
-                    let r = cam.get_ray(u, v);
-                    col = col + color(r, &hit_vec, 0);
-                }
-                col = col / ns as f32;
+                let mut i = 0;
+                let iters = loop {
+                    let newcol = col + color(cam.get_ray(u, v), &hit_vec, 0);
+                    if (newcol.0 - col.0).abs() < nthreshold && (newcol.1 - col.1).abs() < nthreshold && (newcol.2 - col.2) < nthreshold {
+                        // noise threshold reached
+                        break i;
+                    }
+                    col = newcol;
+                    if i == ns-1 {
+                        break i;
+                    }
+                    i+=1;
+                };
+                col = col / (iters+1) as f32;
                 col = Vec3(
                     col.0.sqrt().min(1.0),
                     col.1.sqrt().min(1.0),
@@ -75,7 +84,7 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/x.jpeg",
+        "c://Users/User/Desktop/doyouwork.jpeg",
         image::ImageFormat::JPEG,
     )
 }

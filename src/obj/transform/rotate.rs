@@ -89,6 +89,6 @@ impl<H: Hittable> Hittable for RotateY<H> {
     }
 
     fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        self.bbox
+        self.bbox.clone()
     }
 }
