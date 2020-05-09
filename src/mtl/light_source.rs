@@ -14,7 +14,7 @@ impl<W: Wrappable> LightDiffuse<W> {
 }
 
 impl<W: Wrappable> Scatterable for LightDiffuse<W> {
-    fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, _: &Ray, _: Hit) -> Option<(Ray, Vec3)> {
         None
     }
 

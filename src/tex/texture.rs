@@ -1,5 +1,5 @@
 use crate::math::Vec3;
-use image::{DynamicImage, GenericImageView, ImageResult};
+use image::{DynamicImage, GenericImageView};
 
 pub trait Wrappable {
     fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3;
@@ -17,7 +17,7 @@ impl ConstTexture {
 }
 
 impl Wrappable for ConstTexture {
-    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
+    fn value(&self, _: f32, _: f32, _: Vec3) -> Vec3 {
         self.color
     }
 }
@@ -56,7 +56,7 @@ impl ImageTexture {
 }
 
 impl Wrappable for ImageTexture {
-    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
+    fn value(&self, u: f32, v: f32, _: Vec3) -> Vec3 {
         let (nx, ny) = self.image.dimensions();
         let i = ((u * nx as f32) as u32).max(0).min(nx - 1);
         let j = (((1.0 - v) * ny as f32) as u32).max(0).min(ny - 1);

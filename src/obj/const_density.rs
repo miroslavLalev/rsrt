@@ -24,7 +24,7 @@ impl<H: Hittable, S: Scatterable> Hittable for ConstDensity<H, S> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         if let Some(hit1) = self.hittable.hit(r, std::f32::MIN, std::f32::MAX) {
             if let Some(hit2) = self.hittable.hit(r, hit1.t() + 0.0001, std::f32::MAX) {
-                let mut hit1 = Hit::new(
+                let hit1 = Hit::new(
                     hit1.t().max(t_min),
                     hit1.p(),
                     hit1.n(),
@@ -32,7 +32,7 @@ impl<H: Hittable, S: Scatterable> Hittable for ConstDensity<H, S> {
                     hit1.u(),
                     hit1.v(),
                 );
-                let mut hit2 = Hit::new(
+                let hit2 = Hit::new(
                     hit2.t().min(t_max),
                     hit2.p(),
                     hit2.n(),

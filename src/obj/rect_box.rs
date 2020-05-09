@@ -3,18 +3,16 @@ use crate::mtl::Scatterable;
 use crate::obj::transform::FlipNormals;
 use crate::obj::{XYRect, XZRect, YZRect, AABB};
 use crate::trace::{Hit, HitVec, Hittable, Ray};
-use std::rc::Rc;
 
-pub struct RectBox<M: Scatterable> {
+pub struct RectBox {
     p_min: Vec3,
     p_max: Vec3,
-    mat: M,
 
     sides: HitVec,
 }
 
-impl<M: Scatterable + Clone + 'static> RectBox<M> {
-    pub fn new(p_min: Vec3, p_max: Vec3, mat: M) -> RectBox<M> {
+impl RectBox {
+    pub fn new<M: Scatterable + Clone + 'static>(p_min: Vec3, p_max: Vec3, mat: M) -> RectBox {
         let mut sides: Vec<Box<dyn Hittable>> = Vec::with_capacity(6);
         sides.push(Box::new(XYRect::new(
             p_min.0,
@@ -68,18 +66,17 @@ impl<M: Scatterable + Clone + 'static> RectBox<M> {
         RectBox {
             p_min,
             p_max,
-            mat,
             sides: HitVec::new(sides),
         }
     }
 }
 
-impl<M: Scatterable> Hittable for RectBox<M> {
+impl Hittable for RectBox {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         self.sides.hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(AABB::new(self.p_min, self.p_max))
     }
 }

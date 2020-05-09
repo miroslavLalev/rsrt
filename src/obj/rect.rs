@@ -53,7 +53,7 @@ impl<M: Scatterable> Hittable for XYRect<M> {
         ))
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(AABB::new(
             Vec3(self.x0, self.y0, self.k - EPS),
             Vec3(self.x1, self.y1, self.k + EPS),
@@ -109,7 +109,7 @@ impl<M: Scatterable> Hittable for XZRect<M> {
         ))
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(AABB::new(
             Vec3(self.x0, self.k - EPS, self.z0),
             Vec3(self.x1, self.k + EPS, self.z1),
@@ -165,7 +165,7 @@ impl<M: Scatterable> Hittable for YZRect<M> {
         ))
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(AABB::new(
             Vec3(self.k - EPS, self.y0, self.z0),
             Vec3(self.k + EPS, self.y1, self.z1),
@@ -230,8 +230,9 @@ mod tests {
     }
 
     impl Scatterable for TestMaterial {
-        fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
-            None
+        fn scatter(&self, _: &Ray, _: Hit) -> Option<(Ray, Vec3)> {
+            let rref = self.res.as_ref();
+            Some((rref?.0.clone(), rref?.1))
         }
     }
 }

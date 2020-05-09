@@ -66,7 +66,7 @@ impl<M: Scatterable> Hittable for Sphere<M> {
         None
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(AABB::new(
             self.center - Vec3(self.r, self.r, self.r),
             self.center + Vec3(self.r, self.r, self.r),
@@ -109,8 +109,9 @@ mod tests {
     }
 
     impl Scatterable for TestMaterial {
-        fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
-            None
+        fn scatter(&self, _: &Ray, _: Hit) -> Option<(Ray, Vec3)> {
+            let rref = self.res.as_ref();
+            Some((rref?.0.clone(), rref?.1))
         }
     }
 }

@@ -109,7 +109,7 @@ fn prepare_scene(nx: u32, ny: u32) -> (Camera, HitVec) {
     (cam, HitVec::new(objects))
 }
 
-fn compute_background(r: &Ray) -> Vec3 {
+fn compute_background(_: &Ray) -> Vec3 {
     Vec3(0.7, 0.7, 0.7)
 }
 

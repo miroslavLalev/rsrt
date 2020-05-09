@@ -57,10 +57,10 @@ impl BVHNode {
             let mut iter = elements.into_iter();
             let mut v_left = Vec::new();
             let mut v_right = Vec::new();
-            for i in 0..(len / 2) {
+            for _ in 0..(len / 2) {
                 v_left.push(iter.next().unwrap());
             }
-            for i in (len / 2)..(len - 1) {
+            for _ in (len / 2)..(len - 1) {
                 v_right.push(iter.next().unwrap());
             }
 
@@ -110,7 +110,7 @@ impl Hittable for BVHNode {
         None
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
         Some(self.bbox)
     }
 }
