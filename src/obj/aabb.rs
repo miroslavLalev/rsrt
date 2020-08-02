@@ -62,9 +62,9 @@ pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
         box0.min.2.min(box1.min.2),
     );
     let max = Vec3(
-        box0.min.0.max(box1.min.0),
-        box0.min.1.max(box1.min.1),
-        box0.min.2.max(box1.min.2),
+        box0.max.0.max(box1.max.0),
+        box0.max.1.max(box1.max.1),
+        box0.max.2.max(box1.max.2),
     );
 
     AABB { min, max }

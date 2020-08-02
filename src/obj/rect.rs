@@ -75,14 +75,7 @@ pub struct XZRect<M: Scatterable> {
 
 impl<M: Scatterable> XZRect<M> {
     pub fn new(x0: f32, z0: f32, x1: f32, z1: f32, k: f32, mat: M) -> XZRect<M> {
-        XZRect {
-            x0,
-            z0,
-            x1,
-            z1,
-            k,
-            mat,
-        }
+        XZRect { x0, z0, x1, z1, k, mat }
     }
 }
 

@@ -14,17 +14,18 @@ impl<H: Hittable> RotateY<H> {
         let rad = (std::f32::consts::PI / 180.0) * angle;
         let sin_theta = rad.sin();
         let cos_theta = rad.cos();
-        let bbox = hittable.bounding_box(0.0, 1.0);
-        if bbox.is_none() {
-            return RotateY {
+        match hittable.bounding_box(0.0, 1.0) {
+            None => RotateY {
                 hittable,
                 sin_theta,
                 cos_theta,
                 bbox: None,
-            };
+            },
+            Some(bbox) => RotateY::rotate_bbox(hittable, cos_theta, sin_theta, bbox)
         }
-        let bbox = bbox.expect("BBox already verified to exist");
+    }
 
+    fn rotate_bbox(hittable: H, cos_theta: f32, sin_theta: f32, bbox: AABB) -> RotateY<H> {
         let mut min = Vec3(std::f32::MAX, std::f32::MAX, std::f32::MAX);
         let mut max = Vec3(std::f32::MIN, std::f32::MIN, std::f32::MIN);
 

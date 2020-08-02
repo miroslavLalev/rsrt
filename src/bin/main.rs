@@ -18,8 +18,8 @@ use std::rc::Rc;
 fn main() -> Result<(), std::io::Error> {
     let nx = 1000;
     let ny = 1000;
-    let ns = 100;
-    let nthreshold = 0.005;
+    let ns = 1000;
+    let nthreshold = 0.0001;
     let strategy = Bucket::new(nx, ny, 4);
 
     let (cam, hit_vec) = prepare_scene(nx, ny);
@@ -84,21 +84,21 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     buf.save_with_format(
-        "c://Users/User/Desktop/doyouwork.jpeg",
+        "c://Users/User/Desktop/watery_-1.jpeg",
         image::ImageFormat::JPEG,
     )
 }
 
 fn prepare_scene(nx: u32, ny: u32) -> (Camera, HitVec) {
-    let lookfrom = Vec3(13.0, 2.0, 3.0);
+    let lookfrom = Vec3(50.0, 0.0, 0.0);
     let lookat = Vec3(0.0, 0.0, 0.0);
-    let focus_dist = 10.0;
+    let focus_dist = 4.0;
     let aperture = 0.0;
     let cam = Camera::new(
         lookfrom,
         lookat,
         Vec3(0.0, 1.0, 0.0),
-        20.0,
+        4.0,
         nx as f32 / ny as f32,
         aperture,
         focus_dist,
@@ -106,14 +106,10 @@ fn prepare_scene(nx: u32, ny: u32) -> (Camera, HitVec) {
         1.0,
     );
 
-    let objects: Vec<Box<dyn Hittable>> = vec![Box::new(MovSphere::new(
-        Vec3(0.0, 0.0, 0.0),
-        0.0,
-        Vec3(0.0, 0.5, 0.0),
-        1.0,
-        1.0,
-        Lambertian::new(ConstTexture::new(Vec3(0.5, 0.5, 0.0))),
-    ))];
+    let objects: Vec<Box<dyn Hittable>> = vec![
+        Box::new(Sphere::new(Vec3(-6.0, 0.0, 0.0), 1.0, Lambertian::new(ConstTexture::new(Vec3(0.8, 0.1, 0.1))))),
+        Box::new(Sphere::new(Vec3(-5.0, -1.0, 0.0), 1.0, Dielectric::new(-1.33, ConstTexture::new(Vec3(0.1, 0.4, 0.4))))),
+    ];
 
     (cam, HitVec::new(objects))
 }
