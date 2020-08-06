@@ -76,7 +76,7 @@ impl Hittable for RectBox {
         self.sides.hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(AABB::new(self.p_min, self.p_max))
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        AABB::new(self.p_min, self.p_max)
     }
 }

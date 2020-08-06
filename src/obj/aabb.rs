@@ -6,11 +6,22 @@ use crate::trace::Ray;
 pub struct AABB {
     min: Vec3,
     max: Vec3,
+
+    // hidden == no bounding box
+    // this is used only for empty
+    // object trees, which is very specific
+    // corner case => better to not make
+    // hittable.bounding_box -> Option<AABB>
+    hidden: bool,
 }
 
 impl AABB {
     pub fn new(min: Vec3, max: Vec3) -> AABB {
-        AABB { min, max }
+        AABB { min, max, hidden: false }
+    }
+
+    pub fn new_hidden() -> AABB {
+        AABB { min: Vec3(0.0, 0.0, 0.0), max: Vec3(0.0, 0.0, 0.0), hidden: true }
     }
 
     pub fn min(&self) -> Vec3 {
@@ -22,6 +33,10 @@ impl AABB {
     }
 
     pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> bool {
+        if self.hidden {
+            return false
+        }
+
         let (t0, t1) = hit_axis(self.min.0, self.max.0, r.origin().0, r.direction().0);
         let t_min = t_min.max(t0);
         let t_max = t_max.min(t1);
@@ -39,11 +54,7 @@ impl AABB {
         let (t0, t1) = hit_axis(self.min.2, self.max.2, r.origin().2, r.direction().2);
         let t_min = t_min.max(t0);
         let t_max = t_max.min(t1);
-        if t_min < t_max {
-            return false;
-        }
-
-        true
+        t_min > t_max
     }
 }
 
@@ -67,5 +78,5 @@ pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
         box0.max.2.max(box1.max.2),
     );
 
-    AABB { min, max }
+    AABB { min, max, hidden: box0.hidden || box1.hidden }
 }

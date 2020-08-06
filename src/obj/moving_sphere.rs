@@ -80,7 +80,7 @@ impl<M: Scatterable> Hittable for MovSphere<M> {
         None
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
         let box_begin = AABB::new(
             self.center_begin - Vec3(self.r, self.r, self.r),
             self.center_begin + Vec3(self.r, self.r, self.r),
@@ -90,6 +90,6 @@ impl<M: Scatterable> Hittable for MovSphere<M> {
             self.center_end + Vec3(self.r, self.r, self.r),
         );
 
-        Some(surrounding_box(box_begin, box_end))
+        surrounding_box(box_begin, box_end)
     }
 }

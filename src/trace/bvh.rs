@@ -17,31 +17,25 @@ impl BVHNode {
         if axis == 0 {
             elements.sort_by(|h1, h2| {
                 let box1 = h1
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 let box2 = h2
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 box1.min().0.partial_cmp(&box2.min().0).unwrap()
             });
         } else if axis == 1 {
             elements.sort_by(|h1, h2| {
                 let box1 = h1
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 let box2 = h2
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 box1.min().1.partial_cmp(&box2.min().1).unwrap()
             });
         } else {
             elements.sort_by(|h1, h2| {
                 let box1 = h1
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 let box2 = h2
-                    .bounding_box(0.0, 0.0)
-                    .expect("missing bbox in BVHNode construction");
+                    .bounding_box(0.0, 0.0);
                 box1.min().2.partial_cmp(&box2.min().2).unwrap()
             });
         }
@@ -71,11 +65,9 @@ impl BVHNode {
         };
 
         let box_left = left
-            .bounding_box(time_begin, time_end)
-            .expect("missing bbox in BVHNode construction");
+            .bounding_box(time_begin, time_end);
         let box_right = right
-            .bounding_box(time_begin, time_end)
-            .expect("missing bbox in BVHNode construction");
+            .bounding_box(time_begin, time_end);
 
         let bbox = surrounding_box(box_left, box_right);
         BVHNode { left, right, bbox }
@@ -110,7 +102,7 @@ impl Hittable for BVHNode {
         None
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(self.bbox.clone())
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        self.bbox.clone()
     }
 }

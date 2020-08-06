@@ -30,14 +30,11 @@ impl<H: Hittable> Hittable for Translate<H> {
         None
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
-        if let Some(bbox) = self.hittable.bounding_box(t_min, t_max) {
-            return Some(AABB::new(
-                bbox.min() + self.offset,
-                bbox.max() + self.offset,
-            ));
-        }
-
-        None
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> AABB {
+        let bbox = self.hittable.bounding_box(t_min, t_max);
+        AABB::new(
+            bbox.min() + self.offset,
+            bbox.max() + self.offset,
+        )
     }
 }

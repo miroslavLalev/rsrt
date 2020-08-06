@@ -6,7 +6,7 @@ pub struct RotateY<H: Hittable> {
     hittable: H,
     sin_theta: f32,
     cos_theta: f32,
-    bbox: Option<AABB>,
+    bbox: AABB,
 }
 
 impl<H: Hittable> RotateY<H> {
@@ -14,15 +14,8 @@ impl<H: Hittable> RotateY<H> {
         let rad = (std::f32::consts::PI / 180.0) * angle;
         let sin_theta = rad.sin();
         let cos_theta = rad.cos();
-        match hittable.bounding_box(0.0, 1.0) {
-            None => RotateY {
-                hittable,
-                sin_theta,
-                cos_theta,
-                bbox: None,
-            },
-            Some(bbox) => RotateY::rotate_bbox(hittable, cos_theta, sin_theta, bbox)
-        }
+        let bbox = hittable.bounding_box(0.0, 1.0);
+        RotateY::rotate_bbox(hittable, cos_theta, sin_theta, bbox)
     }
 
     fn rotate_bbox(hittable: H, cos_theta: f32, sin_theta: f32, bbox: AABB) -> RotateY<H> {
@@ -58,7 +51,7 @@ impl<H: Hittable> RotateY<H> {
             hittable,
             sin_theta,
             cos_theta,
-            bbox: Some(AABB::new(min, max)),
+            bbox: AABB::new(min, max),
         }
     }
 }
@@ -89,7 +82,7 @@ impl<H: Hittable> Hittable for RotateY<H> {
         None
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
         self.bbox.clone()
     }
 }

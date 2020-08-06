@@ -64,7 +64,7 @@ impl<H: Hittable, S: Scatterable> Hittable for ConstDensity<H, S> {
         None
     }
 
-    fn bounding_box(&self, t_min: f32, t_max: f32) -> Option<AABB> {
+    fn bounding_box(&self, t_min: f32, t_max: f32) -> AABB {
         self.hittable.bounding_box(t_min, t_max)
     }
 }

@@ -66,11 +66,11 @@ impl<M: Scatterable> Hittable for Sphere<M> {
         None
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        AABB::new(
             self.center - Vec3(self.r, self.r, self.r),
             self.center + Vec3(self.r, self.r, self.r),
-        ))
+        )
     }
 }
 
@@ -98,8 +98,7 @@ mod tests {
     fn test_sphere_bbox() {
         let s = Sphere::new(Vec3(1.0, 1.0, 1.0), 1.0, TestMaterial { res: None });
         let bbox = s
-            .bounding_box(0.0, 0.0)
-            .expect("bbox for sphere should always defined");
+            .bounding_box(0.0, 0.0);
         assert_eq!(bbox.min(), Vec3(0.0, 0.0, 0.0));
         assert_eq!(bbox.max(), Vec3(2.0, 2.0, 2.0));
     }

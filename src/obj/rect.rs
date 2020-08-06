@@ -53,11 +53,11 @@ impl<M: Scatterable> Hittable for XYRect<M> {
         ))
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        AABB::new(
             Vec3(self.x0, self.y0, self.k - EPS),
             Vec3(self.x1, self.y1, self.k + EPS),
-        ))
+        )
     }
 }
 
@@ -102,11 +102,11 @@ impl<M: Scatterable> Hittable for XZRect<M> {
         ))
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        AABB::new(
             Vec3(self.x0, self.k - EPS, self.z0),
             Vec3(self.x1, self.k + EPS, self.z1),
-        ))
+        )
     }
 }
 
@@ -158,11 +158,11 @@ impl<M: Scatterable> Hittable for YZRect<M> {
         ))
     }
 
-    fn bounding_box(&self, _: f32, _: f32) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _: f32, _: f32) -> AABB {
+        AABB::new(
             Vec3(self.k - EPS, self.y0, self.z0),
             Vec3(self.k + EPS, self.y1, self.z1),
-        ))
+        )
     }
 }
 
