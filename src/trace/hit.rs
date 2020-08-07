@@ -77,17 +77,12 @@ impl Hittable for HitVec {
     }
 
     fn bounding_box(&self, t_min: f32, t_max: f32) -> AABB {
-        let mut iter = self.elements.iter();
-        let first_item = iter.next();
-        if first_item.is_none() {
-            return AABB::new_hidden()
-        }
-        let mut tmp_box = first_item.expect("first_item validated to exist").bounding_box(t_min, t_max);
-
-        for item in iter {
-            tmp_box = surrounding_box(item.bounding_box(t_min, t_max), tmp_box);
-        }
-        tmp_box
+        self.elements.iter().fold(
+            AABB::new_hidden(),
+            |res, cur| {
+                surrounding_box(res, cur.bounding_box(t_min, t_max))
+            }
+        )
     }
 }
 
