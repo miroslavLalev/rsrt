@@ -1,27 +1,34 @@
 use crate::math::Vec3;
 use image::{DynamicImage, GenericImageView};
 
+/// Wrappable is a trait for textures. It is used to determine
+/// color for a given (u, v) on the output plane. 
 pub trait Wrappable {
     fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3;
 }
 
+/// ConstTexture is a texture with homogeneous color.
 #[derive(Clone)]
 pub struct ConstTexture {
     color: Vec3,
 }
 
 impl ConstTexture {
+    /// Returns a const texture for a given color.
     pub fn new(color: Vec3) -> ConstTexture {
         ConstTexture { color }
     }
 }
 
 impl Wrappable for ConstTexture {
+    /// Returns the color of the texture.
     fn value(&self, _: f32, _: f32, _: Vec3) -> Vec3 {
         self.color
     }
 }
 
+/// CheckerTexture is a texture that creates checker-like wrapping
+/// determined by two other textures.
 pub struct CheckerTexture<W1: Wrappable, W2: Wrappable> {
     t0: W1,
     t1: W2,
@@ -44,6 +51,7 @@ impl<W1: Wrappable, W2: Wrappable> Wrappable for CheckerTexture<W1, W2> {
     }
 }
 
+/// ImageTexture is a texture that creates image wrapper for objects.
 #[derive(Clone)]
 pub struct ImageTexture {
     image: DynamicImage,

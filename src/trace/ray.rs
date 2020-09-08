@@ -1,31 +1,42 @@
 use crate::math::Vec3;
 
+/// Ray is a function P(t) = A + t * B that gives position along a line.
+///     A - vector for ray origin
+///     B - vector for ray direction
 #[derive(Clone)]
 pub struct Ray {
-    a: Vec3,
-    b: Vec3,
+    origin: Vec3,
+    direction: Vec3,
     time: f32,
 }
 
 impl Ray {
-    pub fn new(a: Vec3, b: Vec3, time: f32) -> Ray {
-        Ray { a, b, time }
+    /// Returns a new ray for the given parameters.
+    pub fn new(origin: Vec3, direction: Vec3, time: f32) -> Ray {
+        Ray {
+            origin,
+            direction,
+            time,
+        }
     }
 
+    /// Returns the origin of the ray.
     pub fn origin(&self) -> Vec3 {
-        self.a
+        self.origin
     }
 
+    /// Returns the direction of the ray.
     pub fn direction(&self) -> Vec3 {
-        self.b
+        self.direction
     }
 
     pub fn time(&self) -> f32 {
         self.time
     }
 
+    /// Returns ray function value vector for t - P(t) = A + t * B.
     pub fn point_at_param(&self, t: f32) -> Vec3 {
-        self.a + t * self.b
+        self.origin + t * self.direction
     }
 }
 

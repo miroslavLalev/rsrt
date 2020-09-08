@@ -1,3 +1,8 @@
+/// Bucket is an iterator for at least a given number of
+/// buckets for a given region. The count may vary if buckets
+/// do not fit perfectly into the region.
+/// For example, a pixel space of 1920x1080 could be split into
+/// 10 buckets of size 192x108.
 pub struct Bucket {
     x: u32,
     y: u32,

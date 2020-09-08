@@ -3,6 +3,8 @@ use crate::trace::{Hit, Hittable, Ray};
 use crate::utils::rng::uniform_in_range;
 use std::rc::Rc;
 
+/// BVHNode is a node from bounding volume hierarchy tree. It is used to lower the
+/// count of objects that needs to be interacted with when dealing with specific ray.
 pub struct BVHNode {
     bbox: AABB,
     left: Rc<dyn Hittable>,
@@ -10,6 +12,8 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
+    /// Returns the root of a new bounding volume hierarchy tree, constructed with the given
+    /// hittable objects.
     pub fn new(elements: Vec<Rc<dyn Hittable>>, time_begin: f32, time_end: f32) -> BVHNode {
         let mut elements = elements;
 
@@ -51,10 +55,11 @@ impl BVHNode {
             let mut iter = elements.into_iter();
             let mut v_left = Vec::new();
             let mut v_right = Vec::new();
+
             for _ in 0..(len / 2) {
                 v_left.push(iter.next().unwrap());
             }
-            for _ in (len / 2)..(len - 1) {
+            for _ in (len / 2)..len {
                 v_right.push(iter.next().unwrap());
             }
 
@@ -64,11 +69,8 @@ impl BVHNode {
             )
         };
 
-        let box_left = left
-            .bounding_box(time_begin, time_end);
-        let box_right = right
-            .bounding_box(time_begin, time_end);
-
+        let box_left = left.bounding_box(time_begin, time_end);
+        let box_right = right.bounding_box(time_begin, time_end);
         let bbox = surrounding_box(box_left, box_right);
         BVHNode { left, right, bbox }
     }
@@ -80,26 +82,18 @@ impl Hittable for BVHNode {
             return None;
         }
 
-        // both left & right are available
-        let left_hit = self.left.hit(r, t_min, t_max);
-        let right_hit = self.right.hit(r, t_min, t_max);
-        if left_hit.is_some() && right_hit.is_some() {
-            let left_hit = left_hit?;
-            let right_hit = right_hit?;
-            if left_hit.t() < right_hit.t() {
-                return Some(left_hit);
-            } else {
-                return Some(right_hit);
+        match (self.left.hit(r, t_min, t_max), self.right.hit(r, t_min, t_max)) {
+            (None, None) => None,
+            (Some(left_hit), None) => Some(left_hit),
+            (None, Some(right_hit)) => Some(right_hit),
+            (Some(left_hit), Some(right_hit)) => {
+                if left_hit.t() < right_hit.t() {
+                    Some(left_hit)
+                } else {
+                    Some(right_hit) 
+                }
             }
         }
-
-        if left_hit.is_some() {
-            return left_hit;
-        }
-        if right_hit.is_some() {
-            return right_hit;
-        }
-        None
     }
 
     fn bounding_box(&self, _: f32, _: f32) -> AABB {

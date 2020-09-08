@@ -17,11 +17,19 @@ pub struct AABB {
 
 impl AABB {
     pub fn new(min: Vec3, max: Vec3) -> AABB {
-        AABB { min, max, hidden: false }
+        AABB {
+            min,
+            max,
+            hidden: false,
+        }
     }
 
     pub fn new_hidden() -> AABB {
-        AABB { min: Vec3(0.0, 0.0, 0.0), max: Vec3(0.0, 0.0, 0.0), hidden: true }
+        AABB {
+            min: Vec3(0.0, 0.0, 0.0),
+            max: Vec3(0.0, 0.0, 0.0),
+            hidden: true,
+        }
     }
 
     pub fn min(&self) -> Vec3 {
@@ -34,7 +42,7 @@ impl AABB {
 
     pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> bool {
         if self.hidden {
-            return false
+            return false;
         }
 
         let (t0, t1) = hit_axis(self.min.0, self.max.0, r.origin().0, r.direction().0);
@@ -70,7 +78,7 @@ pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
     match (box0.hidden, box1.hidden) {
         (true, _) => box1,
         (false, true) => box0,
-        (false, false) => { 
+        (false, false) => {
             let min = Vec3(
                 box0.min.0.min(box1.min.0),
                 box0.min.1.min(box1.min.1),
@@ -82,7 +90,11 @@ pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
                 box0.max.2.max(box1.max.2),
             );
 
-            AABB { min, max, hidden: false }
+            AABB {
+                min,
+                max,
+                hidden: false,
+            }
         }
     }
 }

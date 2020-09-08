@@ -18,7 +18,7 @@ use std::rc::Rc;
 fn main() -> Result<(), std::io::Error> {
     let nx = 1000;
     let ny = 1000;
-    let ns = 1000;
+    let ns = 100;
     let nthreshold = 0.0001;
     let strategy = Bucket::new(nx, ny, 4);
 

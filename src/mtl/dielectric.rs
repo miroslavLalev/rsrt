@@ -19,7 +19,7 @@ impl <W: Wrappable> Dielectric<W> {
 
 impl <W: Wrappable> Scatterable for Dielectric<W> {
     fn scatter(&self, r: &Ray, hit: Hit) -> Option<(Ray, Vec3)> {
-        let reflected = mtl_utils::reflect(r.direction(), hit.n());
+        let reflected = mtl_utils::reflect(r.direction().as_unit(), hit.n());
 
         let (out_norm, ni_nt, cos) = if r.direction().dot(hit.n()) > 0.0 {
             (
@@ -35,7 +35,7 @@ impl <W: Wrappable> Scatterable for Dielectric<W> {
             )
         };
 
-        let (refracted, reflect_prob) = match mtl_utils::refract(r.direction(), out_norm, ni_nt) {
+        let (refracted, reflect_prob) = match mtl_utils::refract(r.direction().as_unit(), out_norm, ni_nt) {
             Some(refracted) => (Some(refracted), mtl_utils::schlick(self.rfn_ind, cos)),
             None => (None, 1.0),
         };

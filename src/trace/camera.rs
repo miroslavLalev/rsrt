@@ -3,6 +3,8 @@ use crate::trace::Ray;
 
 use crate::utils::rng::{rand_in_unit_disk, uniform_in_range};
 
+/// Camera represents an object that can be used to cast rays towards
+/// other objects. 
 pub struct Camera {
     origin: Vec3,
     low_left_corner: Vec3,
@@ -16,6 +18,15 @@ pub struct Camera {
 }
 
 impl Camera {
+    /// Returns a new camera based on the input parameters:
+    ///     lookfrom - point that is the origin of camera's reference frame
+    ///     lookat - point that gives the direction at which camera looks
+    ///     vup - view up vector; used to determine basis (u,v,w) that describes
+    ///           the camera's orientation
+    ///     fov - field of view in degrees
+    ///     aspect - the width/height ratio of the camera's view
+    ///     aperture - controls how big is the output lens of the camera;
+    ///                used for defocus blur effects
     pub fn new(
         lookfrom: Vec3,
         lookat: Vec3,
@@ -50,6 +61,8 @@ impl Camera {
         }
     }
 
+    /// Returns a ray that goes out of the camera towards point (s, t) on the
+    /// output plane.
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         let rd = self.lens_radius * rand_in_unit_disk();
         let offset = self.u * rd.0 + self.v * rd.1;
